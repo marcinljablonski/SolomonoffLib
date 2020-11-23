@@ -22,6 +22,7 @@ public class CLI {
 	public static class OptimisedLexTransducer<N, G extends IntermediateGraph<Pos, E, P, N>> {
 		public final LexUnicodeSpecification<N, G> specs;
 		final ParserListener<LexPipeline<N, G>, Var<N, G>, Pos, E, P, Integer, IntSeq, Integer, N, G> parser;
+		final DependienciesParserListener<LexPipeline<N, G>, Var<N, G>, Pos, E, P, Integer, IntSeq, Integer, N, G> dependenciesParser;
 
 		public OptimisedLexTransducer(LexUnicodeSpecification<N, G> specs) throws CompilationError {
 			this.specs = specs;
@@ -39,10 +40,15 @@ public class CLI {
 			addExternalIdentity(specs);
 			parser = specs.makeParser();
 			parser.addDotAndHashtag();
+			dependenciesParser = new DependienciesParserListener(specs);
 		}
 
 		public void parse(CharStream source) throws CompilationError {
 			parser.parse(source);
+		}
+
+		public void parseDependencies(CharStream source) throws CompilationError {
+			dependenciesParser.parse(source);
 		}
 
 		public void checkStrongFunctionality() throws CompilationError {
@@ -86,6 +92,12 @@ public class CLI {
 		 */
 		public LexPipeline<N, G> getPipeline(String name) {
 			return specs.getPipeline(name);
+		}
+	}
+
+	public static class AutomatonBuilder {
+		public AutomatonBuilder() {
+			parseDependencies();
 		}
 	}
 
